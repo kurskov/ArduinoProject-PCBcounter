@@ -1,7 +1,7 @@
 /*
   PCB Counter
 
-  Version: 0.4.0
+  Version: 1.0.0
   
   Author: Dmitrii Kurskov <dmitrii@kurskov.ru>
   GitHub: https://github.com/kurskov/ArduinoProject-PCBcounter
@@ -40,9 +40,6 @@
 
 // starting set for trigger of PCB position
 bool conveyor = false;
-
-// buzzer status
-bool buzzer = false;
 
 // PCB counter
 int counter = 0;
@@ -84,10 +81,9 @@ void loop() {
       DEBUG("PCB on the conveyor");
       counter++;  // increment of PCB counter
       digitalWrite(PIN_LED, HIGH);
-      if (counter >= COUNT_TARGET && !buzzer) {  // run buzzer
+      if (counter >= COUNT_TARGET) {  // run buzzer
         DEBUG("Buzzer on");
-        digitalWrite(PIN_BUZZER, HIGH);
-        buzzer = true;
+        tone(PIN_BUZZER, 523);
        }
     }
     conveyor = true;
@@ -98,11 +94,10 @@ void loop() {
   }
 
   // stop buzzer
-  if ( digitalRead(PIN_RESET) && buzzer ) {
+  if ( digitalRead(PIN_RESET) && counter ) {
     DEBUG("Buzzer off, counter reset.");
-    digitalWrite(PIN_BUZZER, LOW);
+    noTone(PIN_BUZZER);
     counter = 0;
-    buzzer = false;
     displayReset();
   }
   
