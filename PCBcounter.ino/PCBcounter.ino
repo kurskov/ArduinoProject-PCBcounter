@@ -1,7 +1,17 @@
 /*
   PCB Counter
 
-  Version: 1.0.0
+  The counter receives data from the conveyor drive and the PCB presence sensor.
+  The counter increases its value if, at the beginning of the conveyor movement, 
+  there is a PCB on it.
+  When the set value is reached, a buzzer sounds.
+
+  Additionally:
+    - you can connect the screen via I2C channel
+    - you can enable the status log on the serial port
+    - you can select piezo or buzzer from relay
+
+  Version: 1.1.0
   
   Author: Dmitrii Kurskov <dmitrii@kurskov.ru>
   GitHub: https://github.com/kurskov/ArduinoProject-PCBcounter
@@ -15,7 +25,7 @@
 
 /* DEBUG MODE */
 
-#define DEBUG_ON           // comment this string for debug mode turn off
+//#define DEBUG_ON         // uncomment this string for debug mode turn on
 
 #ifdef DEBUG_ON
     #define DEBUG(x) Serial.println(x)
@@ -35,7 +45,10 @@
 
 /* SETTINGS */
 
-#define COUNT_TARGET 5    // target for PCB counter
+#define COUNT_TARGET 5     // target for PCB counter
+
+#define BUZZER_RELAY       // connect buzzer from relay
+                           // comment this string if used piezo 
 
 
 // starting set for trigger of PCB position
@@ -83,7 +96,11 @@ void loop() {
       digitalWrite(PIN_LED, HIGH);
       if (counter >= COUNT_TARGET) {  // run buzzer
         DEBUG("Buzzer on");
-        tone(PIN_BUZZER, 523);
+        #ifdef BUZZER_RELAY
+          digitalWrite(PIN_BUZZER, HIGH);
+        #else
+          tone(PIN_BUZZER, 523);
+        #endif
        }
     }
     conveyor = true;
@@ -96,7 +113,11 @@ void loop() {
   // stop buzzer
   if ( digitalRead(PIN_RESET) && counter ) {
     DEBUG("Buzzer off, counter reset.");
-    noTone(PIN_BUZZER);
+    #ifdef BUZZER_RELAY
+      digitalWrite(PIN_BUZZER, LOW);
+    #else
+      noTone(PIN_BUZZER);
+    #endif
     counter = 0;
     displayReset();
   }
