@@ -7,7 +7,7 @@ The PCB counter for the destaker of a SMA line.
 
 The counter receives data from the conveyor drive and the PCB presence sensor.
 The counter increases its value if, at the beginning of the conveyor movement, there is a PCB on it.
-When the set value is reached, a buzzer sounds.
+When the set value is reached, a buzzer sounds and display backlight on.
 
 The board presence and conveyor movement sensors operate at a low signal level.
 
