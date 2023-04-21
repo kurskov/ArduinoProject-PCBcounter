@@ -4,14 +4,16 @@
   The counter receives data from the conveyor drive and the PCB presence sensor.
   The counter increases its value if, at the beginning of the conveyor movement, 
   there is a PCB on it.
-  When the set value is reached, a buzzer sounds.
+  When the set value is reached, a buzzer sounds and display backlight on.
+
+  The board presence and conveyor movement sensors operate at a low signal level.
 
   Additionally:
     - you can connect the screen via I2C channel
     - you can enable the status log on the serial port
     - you can select piezo or buzzer from relay
 
-  Version: 1.1.0
+  Version: 1.2.0
   
   Author: Dmitrii Kurskov <dmitrii@kurskov.ru>
   GitHub: https://github.com/kurskov/ArduinoProject-PCBcounter
@@ -64,7 +66,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 void setup() {
   
   #ifdef DEBUG_ON
-     Serial.begin(9600);
+    Serial.begin(9600);
   #endif
   
   // pin setting
@@ -79,7 +81,7 @@ void setup() {
 
   // run display
   lcd.init();
-  lcd.backlight();
+  lcd.noBacklight();
   displayReset();
   
   DEBUG("Initialization complete");
@@ -88,9 +90,9 @@ void setup() {
 
 void loop() {
   
-  if ( !conveyor && digitalRead(PIN_CONV) ) { // conveyor started
+  if ( !conveyor && !digitalRead(PIN_CONV) ) { // conveyor started
     DEBUG("Conveyor started");
-    if ( digitalRead(PIN_IRS) ) { // PCB on the conveyor
+    if ( !digitalRead(PIN_IRS) ) { // PCB on the conveyor
       DEBUG("PCB on the conveyor");
       counter++;  // increment of PCB counter
       digitalWrite(PIN_LED, HIGH);
@@ -101,10 +103,11 @@ void loop() {
         #else
           tone(PIN_BUZZER, 523);
         #endif
+        lcd.backlight();
        }
     }
     conveyor = true;
-  } else if ( conveyor && !digitalRead(PIN_CONV) ) {  // conveyor stoped and trigger reset
+  } else if ( conveyor && digitalRead(PIN_CONV) ) {  // conveyor stoped and trigger reset
     DEBUG("Conveyor stoped");
     conveyor = false;
     digitalWrite(PIN_LED, LOW);
@@ -119,6 +122,7 @@ void loop() {
       noTone(PIN_BUZZER);
     #endif
     counter = 0;
+    lcd.noBacklight();
     displayReset();
   }
   
