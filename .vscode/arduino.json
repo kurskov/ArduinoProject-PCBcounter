@@ -3,5 +3,5 @@
     "board": "arduino:avr:nano",
     "programmer": "usbtinyisp",
     "port": "/dev/ttyUSB0",
-    "sketch": "PCBcounter.ino/PCBcounter.ino"
+    "sketch": "PCBcounter/PCBcounter.ino"
 }
