@@ -13,7 +13,7 @@
     - you can enable the status log on the serial port
     - you can select piezo or buzzer from relay
 
-  Version: 1.2.0
+  Version: 1.2.1
   
   Author: Dmitrii Kurskov <dmitrii@kurskov.ru>
   GitHub: https://github.com/kurskov/ArduinoProject-PCBcounter
@@ -129,7 +129,22 @@ void loop() {
   // print result
   lcd.setCursor(9, 1);
   lcd.print(counter);
-  
+
+  #ifdef DEBUG_ON
+    lcd.setCursor(15, 0);
+    if (!digitalRead(PIN_CONV)) {
+      lcd.print('c');
+    } else {
+      lcd.print('_');
+    }
+    
+    lcd.setCursor(15, 1);
+    if (!digitalRead(PIN_IRS)) {
+      lcd.print('i');
+    } else {
+      lcd.print('_');
+    }
+  #endif
 }
 
 void displayReset() {
